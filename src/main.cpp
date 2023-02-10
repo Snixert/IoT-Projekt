@@ -50,12 +50,6 @@ IPAddress subnet(255, 255, 0, 0);
 unsigned long previousMillis = 0;
 const long interval = 10000;  // interval to wait for Wi-Fi connection (milliseconds)
 
-// Set LED GPIO
-const int ledPin = 2;
-// Stores LED state
-
-String ledState;
-
 // Initialize SPIFFS
 void initSPIFFS() {
   if (!SPIFFS.begin(true)) {
@@ -94,7 +88,7 @@ void writeFile(fs::FS &fs, const char * path, const char * message){
   if(file.print(message)){
     Serial.println("- file written");
   } else {
-    Serial.println("- frite failed");
+    Serial.println("- write failed");
   }
 }
 
@@ -132,20 +126,6 @@ bool initWiFi() {
   return true;
 }
 
-// Replaces placeholder with LED state value
-String processor(const String& var) {
-  if(var == "STATE") {
-    if(digitalRead(ledPin)) {
-      ledState = "ON";
-    }
-    else {
-      ledState = "OFF";
-    }
-    return ledState;
-  }
-  return String();
-}
-
 String readCelciusTemperature() {
   sensors.requestTemperatures(); 
   float temperatureC = sensors.getTempCByIndex(0);
@@ -165,10 +145,6 @@ void setup() {
   Serial.begin(115200);
 
   initSPIFFS();
-
-  // Set GPIO 2 as an OUTPUT
-  pinMode(ledPin, OUTPUT);
-  digitalWrite(ledPin, LOW);
   
   // Load values saved in SPIFFS
   ssid = readFile(SPIFFS, ssidPath);
@@ -183,7 +159,7 @@ void setup() {
   if(initWiFi()) {
     // Route for root / web page
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-      request->send(SPIFFS, "/index.html", "text/html", false, processor);
+      request->send(SPIFFS, "/index.html", "text/html", false);
     });
     server.serveStatic("/", SPIFFS, "/");
     
@@ -198,7 +174,7 @@ void setup() {
     // Connect to Wi-Fi network with SSID and password
     Serial.println("Setting AP (Access Point)");
     // NULL sets an open Access Point
-    WiFi.softAP("ESP-WIFI-MANAGER", NULL);
+    WiFi.softAP("ESP-WIFI-MANAGER Jimmy", NULL);
 
     IPAddress IP = WiFi.softAPIP();
     Serial.print("AP IP address: ");
@@ -256,7 +232,6 @@ void setup() {
       ESP.restart();
     });
     server.begin();
-    Serial.println("AYO IM BEGINNING THE SERVER");
   }
 }
 

@@ -29,7 +29,10 @@ copies or substantial portions of the Software. -->
 <script>
 var chartT = new Highcharts.Chart({
   chart:{ renderTo : 'chart-temperature-celcius' },
-  title: { text: 'Temperature Celcius' },
+  time:{
+    timezoneOffset: -60
+  },
+  title: { text: 'DS18B20 Temperature Measurements' },
   series: [{
     showInLegend: false,
     data: []
@@ -41,11 +44,10 @@ var chartT = new Highcharts.Chart({
     series: { color: '#059e8a' }
   },
   xAxis: { type: 'datetime',
-    dateTimeLabelFormats: { second: '%H:%M:%S' }
+    dateTimeLabelFormats: { minute: '%H:%M:%S' }
   },
   yAxis: {
     title: { text: 'Temperature (Celsius)' }
-    //title: { text: 'Temperature (Fahrenheit)' }
   },
   credits: { enabled: false }
 });
